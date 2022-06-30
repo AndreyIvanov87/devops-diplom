@@ -31,3 +31,17 @@ variable "yandex_s3_secret_key" {
         sensitive = true
 	}
 
+# Заменить на ID своего образа
+# ID можно узнать с помощью команды yc compute image list
+variable "ubuntu" {
+  default = "fd83mo49vdjcugs26k8l"
+}
+
+#задаем число нод в каждом воркспейсе
+locals {
+  db_instance_count = {
+    stage = 2
+    #prod  = 2
+  }
+}
+
