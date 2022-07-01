@@ -1,22 +1,20 @@
 ---
-  - name: test connect and basics
+  - name: wait for hosts to up
     hosts: all
     gather_facts: no
-    pre_tasks:
+    tasks:
       - name: Wait 300 seconds, but only start checking after 60 seconds
         ansible.builtin.wait_for_connection:
           delay: 60
           timeout: 300
 
+
+  - name: Print os facts
+    hosts: all
+    gather_facts: yes
     tasks:
-      - name: Print variable
+      - name: Print OS
         debug:
-          msg: "{{ group_variable }}"
-      
-#      - name: register os
-#        ansible.builtin.command: "uname -a"
-#          register: uname
-#      - name: print os
-#        debug:
-#          msg: "{{ uname }}"
+          msg: "{{ ansible_distribution }}"
+
 

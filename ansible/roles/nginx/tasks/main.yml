@@ -1,0 +1,25 @@
+- name: Install Nginx Web Server on Debian Family
+  apt:
+    name=nginx
+    state=latest
+  when:
+    ansible_os_family == "Debian"
+  notify:
+    - nginx systemd
+
+- name: Replace nginx.conf
+  template:
+    src=templates/nginx.conf
+    dest=/etc/nginx/nginx.conf
+
+
+- name: place vhost
+  template:
+    src=templates/www.netology.tech.conf
+    dest=/etc/nginx/sites-enabled/www.netology.tech.conf
+
+- name: Remove default host
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
