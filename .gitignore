@@ -29,3 +29,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+
+#ignore ansible dinamic inventory
+ansible/inventory

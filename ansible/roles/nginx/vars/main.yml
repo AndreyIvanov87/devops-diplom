@@ -1,2 +1,18 @@
-app_host: "192.168.1.201"
+app_host: "192.168.1.203"
+sites: 
+  - fqdn: "www.netology.tech"
+    host: "192.168.1.203"
+  - fqdn: "app.netology.tech"
+    host: "192.168.1.203"
+  - fqdn: "gitlab.netology.tech"
+    host: "192.168.1.204"
+  - fqdn: "runner.netology.tech"
+    host: "192.168.1.204"
+  - fqdn: "grafana.netology.tech"
+    host: "192.168.1.206"
+  - fqdn: "prometheus.netology.tech"
+    host: "192.168.1.206"
+  - fqdn: "alertmanager.netology.tech"
+    host: "192.168.1.206"
+    
 
