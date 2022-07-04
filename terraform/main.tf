@@ -7,9 +7,9 @@ provider "yandex" {
 
 
 resource "yandex_compute_instance" "gate" {
-  name = "gate-name"
+  name = "gate"
   platform_id = "standard-v1"
-  hostname    = "gate.netology.tech"
+  #hostname    = "gate.netology.tech"
   
   resources {
     cores  = 2
@@ -41,9 +41,9 @@ resource "yandex_compute_instance" "gate" {
 
 resource "yandex_compute_instance" "dbvm" {
   platform_id = "standard-v1"
-  hostname    = "db0${count.index+1}.netology.tech"
+#  hostname    = "db0${count.index+1}.netology.tech"
   count       = local.db_instance_count[terraform.workspace]
-  name        = format("db-%02d", count.index + 1)
+  name        = "db0${count.index+1}"
   resources {
     cores  = 2
     memory = 2
@@ -58,7 +58,7 @@ resource "yandex_compute_instance" "dbvm" {
 
   network_interface {
     subnet_id = yandex_vpc_subnet.private-subnet.id
-#    ip_address = "192.168.2.20${count.index+1}"
+    ip_address = "192.168.2.20${count.index+1}"
 }
 
   metadata = {

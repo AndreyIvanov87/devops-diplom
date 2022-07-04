@@ -11,7 +11,7 @@ variable "yandex_folder_id" {
 }
 
 
-#Зона размещения инфраструктуры по-умолчанию
+# Зона размещения инфраструктуры по-умолчанию
 variable "yandex_zone_default" {
   default = "ru-central1-a"
 }
@@ -33,11 +33,13 @@ variable "yandex_s3_secret_key" {
 
 # Заменить на ID своего образа
 # ID можно узнать с помощью команды yc compute image list
+# yc compute image list --folder-id standard-images
+# ubuntu-20-04-lts-v20220509
 variable "ubuntu" {
-  default = "fd83mo49vdjcugs26k8l"
+  default = "fd82re2tpfl4chaupeuf"
 }
 
-#задаем число нод в каждом воркспейсе
+# задаем число нод в каждом воркспейсе
 locals {
   db_instance_count = {
     stage = 2

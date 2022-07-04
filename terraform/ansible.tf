@@ -19,3 +19,13 @@ resource "null_resource" "connect" {
   ]
 }
 
+resource "null_resource" "gate-setup" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/site.yml"
+  }
+
+  depends_on = [
+    null_resource.connect
+  ]
+}
+
