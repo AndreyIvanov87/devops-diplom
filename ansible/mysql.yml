@@ -1,0 +1,9 @@
+---
+- name: install mysql
+  hosts: db
+  gather_facts: yes
+  become: true
+  remote_user: vagrant
+  roles:
+   - mysql-install
+

@@ -29,3 +29,14 @@ resource "null_resource" "gate-setup" {
   ]
 }
 
+
+resource "null_resource" "mysql-setup" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/mysql.yml"
+  }
+
+  depends_on = [
+    null_resource.gate-setup
+  ]
+}
+

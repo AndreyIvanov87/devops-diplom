@@ -1,1 +1,3 @@
 group_variable: all-host
+test_variable: localhost
+

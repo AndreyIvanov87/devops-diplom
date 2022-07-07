@@ -1,0 +1,190 @@
+- name: prepare python Debian Family
+  ansible.builtin.apt:
+    name: python3
+    state: present
+    update_cache: yes 
+  when:
+    ansible_os_family == "Debian"
+
+
+- name: Install mysql Server on Debian Family
+  apt:
+    pkg:
+    - mysql-server-8.0
+    - mysql-client-8.0
+      #- python3
+    - python3-pymysql
+
+  when:
+    ansible_os_family == "Debian"
+
+- name: place mysqld config
+  template:
+    src=templates/mysqld.cnf
+    dest=/etc/mysql/mysql.conf.d/mysqld.cnf
+
+- name: set diffirent server_id for slave
+  ansible.builtin.replace:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: 'server-id = 1'
+    replace: 'server-id = 2' 
+  when:   inventory_hostname   ==   mysql_slave
+
+
+- name: Check that the somefile.conf exists
+  stat:
+    path: /home/vagrant/mysqld.cnf
+  register: stat_kostyl
+
+
+
+- name: enable and start mysql  
+  systemd:
+    name: mysql
+    enabled: yes
+    state: started
+
+
+
+- name: first update for root password
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  when: not stat_kostyl.stat.exists
+
+- name: update root accounts for all hosts
+  mysql_user:  
+    name: root  
+    host: "{{ item }}"  
+    password: "{{ root_password }}"  
+    login_user: root  
+    login_password: "{{ root_password }}"  
+    check_implicit_admin: yes  
+    priv: "*.*:ALL,GRANT"  
+
+  with_items:  
+    - "{{ ansible_hostname }}"  
+    - 127.0.0.1  
+    - ::1  
+    - localhost
+    - 192.168.2.%
+  when: not stat_kostyl.stat.exists
+
+
+#костыль чтобы был флаг на правку привилегий при установке mysql
+- name: place test mysql config for kostyl
+  template:
+    src=templates/mysqld.cnf
+    dest=/home/vagrant/mysqld.cnf
+
+
+#- name: enable and start mysql
+#  systemd:
+#    name: mysql
+#    enabled: yes
+#    state: restarted
+- name: restart mysql
+  service: 
+    name: mysql
+    state: restarted
+
+- name: Create a new database with name 'wordpress'
+  community.mysql.mysql_db:
+    name: wordpress
+    state: present
+    login_user: root
+    login_password: "{{ root_password }}"
+
+- name: Create database user with name 'wordpress' with privileges to database wordpress
+  community.mysql.mysql_user:
+    name: wordpress
+    host: "%"
+    password: "wordpress"
+    priv: 'wordpress.*:ALL'
+    state: present
+    login_user: root
+    login_password: "{{ root_password }}"
+
+- block:
+    - name: start replication
+      debug:
+        msg: here we'll  start replication 
+  
+    - name: block changes to master database
+      community.mysql.mysql_query:
+        login_db: mysql
+        query: FLUSH TABLES WITH READ LOCK;
+        login_user: root
+        login_password: "{{ root_password }}"
+        #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
+        login_host: "{{ mysql_master_ip }}"
+    - name: dump all master host databases    
+      community.mysql.mysql_db:
+        state: dump
+        name: all
+        target: /tmp/dump.sql
+        login_user: root
+        login_password: "{{ root_password }}"
+        #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
+        login_host: "{{ mysql_master_ip }}"
+
+    - name: get master log position      
+      community.mysql.mysql_replication:
+        mode: getprimary
+        login_user: root
+        login_password: "{{ root_password }}"
+        #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
+        login_host: "{{ mysql_master_ip }}"
+      register: master_status
+
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: master_status
+        verbosity: 4
+
+    - name: start master database
+      community.mysql.mysql_query:
+        login_db: mysql
+        query: UNLOCK TABLES;
+        login_user: root
+        login_password: "{{ root_password }}"
+        #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
+        login_host: "{{ mysql_master_ip }}"
+
+
+
+
+
+  when:   inventory_hostname   ==   mysql_slave
+
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: master_status
+    verbosity: 4
+
+
+
+  #V# FLUSH TABLES WITH READ LOCK;
+  #V# dump
+  #V# get master status <<<<<--------------вот тут разобраться как записать значения в переменную и считать
+  #V# UNLOCK TABLES;
+  #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
+  #master меняем на primary в модуле mysql_replication (BLM-повесточка видимо)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

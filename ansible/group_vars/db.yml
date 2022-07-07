@@ -1,1 +1,6 @@
 group_variable: db-host
+mysql_master: db01.netology.tech
+mysql_master_ip: 192.168.2.201
+mysql_slave: db02.netology.tech
+root_password: "test-password"
+wordpress_password: "wordpress"
