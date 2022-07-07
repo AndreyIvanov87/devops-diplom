@@ -36,15 +36,11 @@
     path: /home/vagrant/mysqld.cnf
   register: stat_kostyl
 
-
-
 - name: enable and start mysql  
   systemd:
     name: mysql
     enabled: yes
     state: started
-
-
 
 - name: first update for root password
   community.mysql.mysql_user:
@@ -78,12 +74,6 @@
     src=templates/mysqld.cnf
     dest=/home/vagrant/mysqld.cnf
 
-
-#- name: enable and start mysql
-#  systemd:
-#    name: mysql
-#    enabled: yes
-#    state: restarted
 - name: restart mysql
   service: 
     name: mysql
@@ -140,8 +130,7 @@
 
     - name: Print return information from the previous task
       ansible.builtin.debug:
-        var: master_status
-        verbosity: 4
+        msg: "{{ master_status }}"
 
     - name: start master database
       community.mysql.mysql_query:
@@ -152,39 +141,41 @@
         #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
         login_host: "{{ mysql_master_ip }}"
 
+    - name:  Import dump.sql 
+      community.mysql.mysql_db:
+        state: import
+        name: all
+        target: /tmp/dump.sql
+        login_user: root
+        login_password: "{{ root_password }}"
 
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        msg: 
+          - "{{ master_status['File'] }}"
+          - "{{ master_status['Position'] }}"
 
+    - name: start replication 
+      community.mysql.mysql_replication:
+        mode: changeprimary
+        primary_host: "{{ mysql_master_ip }}"
+        primary_log_file: "{{ master_status['File'] }}"
+        primary_log_pos: "{{ master_status['Position'] }}"
+        primary_user: root
+        primary_password: "{{ root_password }}"
+        login_user: root
+        login_password: "{{ root_password }}"
 
+    - name: start master database
+      community.mysql.mysql_query:
+        login_db: mysql
+        query: START REPLICA;
+        login_user: root
+        login_password: "{{ root_password }}"
 
   when:   inventory_hostname   ==   mysql_slave
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: master_status
-    verbosity: 4
-
-
-
-  #V# FLUSH TABLES WITH READ LOCK;
-  #V# dump
-  #V# get master status <<<<<--------------вот тут разобраться как записать значения в переменную и считать
-  #V# UNLOCK TABLES;
   #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
-  #master меняем на primary в модуле mysql_replication (BLM-повесточка видимо)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  #CHANGE MASTER TO MASTER_HOST='192.168.2.201',MASTER_LOG_FILE='mysql-bin.000006',MASTER_LOG_POS=157, MASTER_USER='root', MASTER_PASSWORD='test-password';
 
 

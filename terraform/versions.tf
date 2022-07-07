@@ -14,6 +14,7 @@ terraform {
     #credentials: use environment variables
     # export AWS_ACCESS_KEY_ID="ХХХХХХХХХХХХХХХХХХХ"
     # export AWS_SECRET_ACCESS_KEY="ХХХХХХХХХХХХХХХ"
+    # export ANSIBLE_HOST_KEY_CHECKING=False 
 
     skip_region_validation      = true
     skip_credentials_validation = true
