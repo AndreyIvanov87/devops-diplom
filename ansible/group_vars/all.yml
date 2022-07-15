@@ -1,3 +1,9 @@
 group_variable: all-host
 test_variable: localhost
+mysql_master: db01.netology.tech
+mysql_master_ip: 192.168.2.201
+mysql_slave: db02.netology.tech
+wordpress_password: "wordpress"
+wordpress_login: "wordpress"
+
 

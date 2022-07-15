@@ -178,4 +178,7 @@
   #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
   #CHANGE MASTER TO MASTER_HOST='192.168.2.201',MASTER_LOG_FILE='mysql-bin.000006',MASTER_LOG_POS=157, MASTER_USER='root', MASTER_PASSWORD='test-password';
 
+  # for test 
+  # login_host:  hostvars."{{ mysql_master }}".ansible_default_ipv4.address
+
 

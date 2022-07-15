@@ -1,0 +1,75 @@
+---
+
+  - hosts: runner.netology.tech
+    become: yes
+    remote_user: vagrant
+
+    tasks:
+      - name: Update apt cache
+        apt: update_cache=yes cache_valid_time=3600
+
+      - name: Install required software
+        apt: 
+          pkg:
+          - curl
+          - git
+          - ca-certificates 
+          - curl
+          - gnupg
+          - lsb-release
+
+      - name: Create directory for gpg-keys
+        file: state=directory mode=0755 dest=/etc/apt/keyrings
+
+      - name: Add Docker’s official GPG key
+        raw:  "curl -o /tmp/key https://download.docker.com/linux/ubuntu/gpg ; gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes /tmp/key ; rm /tmp/key" 
+   
+      - name: Add line to repos file
+        ansible.builtin.lineinfile:
+          path: /etc/apt/sources.list
+          line: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu focal stable"
+          create: yes
+
+#      - name: Install docker
+#        raw: $(curl -fsSL https://get.docker.com -o get-docker.sh && /usr/bin/sh get-docker.sh)
+      - name: Update apt cache
+        apt: update_cache=yes cache_valid_time=3600
+
+      - name: Install required software
+        apt:
+          pkg:
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-compose-plugin
+
+      - name: Add the user vagrant to group docker
+        ansible.builtin.user:
+          name: vagrant
+          groups: docker
+          append: yes
+
+      - name: copy ssh key
+        copy:
+          src: /home/vagrant/.ssh/id_rsa
+          dest: /home/vagrant/.ssh/id_rsa
+          owner: vagrant
+          group: vagrant 
+          mode: 0600
+
+
+      - name: Enable docker daemon
+        systemd:
+          name: docker
+          state: started
+          enabled: yes
+
+
+      - name: Pull images 
+        command: docker pull gitlab/gitlab-runner:latest
+
+#      - name: start runner container
+#        command: 
+
+
+        #gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"

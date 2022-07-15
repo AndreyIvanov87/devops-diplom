@@ -40,3 +40,28 @@ resource "null_resource" "mysql-setup" {
   ]
 }
 
+resource "null_resource" "gitlab-setup" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/gitlab.yml"
+  }
+
+  depends_on = [
+    null_resource.mysql-setup
+  ]
+}
+
+#resource "null_resource" "gitlab-runner" {
+#  provisioner "local-exec" {
+#    command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/runner.yml"
+#  }
+#
+#  depends_on = [
+#    null_resource.gitlab-setup
+#  ]
+#}
+
+
+
+
+
+

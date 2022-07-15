@@ -6,7 +6,7 @@ resource "local_file" "inventory" {
     [nodes:children]
     front
     db
-#    back
+    back
 
     [front]
     gate.netology.tech ansible_host=${yandex_compute_instance.gate.network_interface.0.nat_ip_address}
@@ -18,12 +18,25 @@ resource "local_file" "inventory" {
     [db:vars]
     ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ${yandex_compute_instance.gate.network_interface.0.nat_ip_address}"'
 
+
+    [back]
+    app.netology.tech ansible_host=${yandex_compute_instance.appvm.network_interface.0.ip_address}
+    gitlab.netology.tech ansible_host=${yandex_compute_instance.gitlabvm.network_interface.0.ip_address}
+    runner.netology.tech ansible_host=${yandex_compute_instance.runnervm.network_interface.0.ip_address}
+
+    [back:vars]
+    ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ${yandex_compute_instance.gate.network_interface.0.nat_ip_address}"'
+
+
     DOC
   filename = "../ansible/inventory"
 
   depends_on = [
     yandex_compute_instance.gate,
-    yandex_compute_instance.dbvm
+    yandex_compute_instance.dbvm,
+    yandex_compute_instance.appvm,
+    yandex_compute_instance.gitlabvm,
+    yandex_compute_instance.runnervm
   ]
 
 ################later

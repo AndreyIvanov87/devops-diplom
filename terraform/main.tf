@@ -67,4 +67,89 @@ resource "yandex_compute_instance" "dbvm" {
   }
 }
 
+resource "yandex_compute_instance" "appvm" {
+  platform_id = "standard-v1"
+#  hostname    = "app.netology.tech"
+  name        = "app"
+  resources {
+    cores  = 2
+    memory = 2
+    core_fraction = 20
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = "${var.ubuntu}"
+    }
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.private-subnet.id
+    ip_address = "192.168.2.203"
+}
+
+  metadata = {
+    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
+    user-data = "${file("./user-meta.txt")}"
+  }
+}
+
+resource "yandex_compute_instance" "gitlabvm" {
+  platform_id = "standard-v1"
+#  hostname    = "app.netology.tech"
+  name        = "gitlab"
+  resources {
+    cores  = 4
+    memory = 4
+    core_fraction = 100
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = "${var.ubuntu_gitlab_ce}"
+      size = 20
+    }
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.private-subnet.id
+    ip_address = "192.168.2.204"
+}
+
+  metadata = {
+    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
+    user-data = "${file("./user-meta.txt")}"
+  }
+}
+
+
+resource "yandex_compute_instance" "runnervm" {
+  platform_id = "standard-v1"
+#  hostname    = "runner.netology.tech"
+  name        = "runner"
+  resources {
+    cores  = 4
+    memory = 4
+    core_fraction = 100
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = "${var.ubuntu}"
+      size = 20
+    }
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.private-subnet.id
+    ip_address = "192.168.2.205"
+}
+
+  metadata = {
+    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
+    user-data = "${file("./user-meta.txt")}"
+  }
+}
+
+
 

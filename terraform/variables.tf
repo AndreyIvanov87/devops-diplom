@@ -39,6 +39,11 @@ variable "ubuntu" {
   default = "fd82re2tpfl4chaupeuf"
 }
 
+#ID образа gitlab ce от яндекса
+variable "ubuntu_gitlab_ce" {
+default = "fd8gmpfrnphth71tmuh0"
+}
+
 # задаем число нод в каждом воркспейсе
 locals {
   db_instance_count = {
