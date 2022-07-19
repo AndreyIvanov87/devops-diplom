@@ -1,0 +1,98 @@
+---
+- name: Install aptitude using apt
+  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+#- name: Install required system packages
+#  apt: name={{ item }} state=latest update_cache=yes
+#  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+- name: Install required system packages
+  apt: 
+    pkg:
+    - apt-transport-https
+    - software-properties-common  
+    - curl
+    - git
+    - ca-certificates 
+    - curl
+    - gnupg
+    - lsb-release
+    - python3-pip
+    - virtualenv
+    - python3-setuptools  
+    - net-tools
+    update_cache: yes
+    state: latest
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+#- name: Update apt and install docker-ce
+#  apt: update_cache=yes name=docker-ce state=latest
+
+- name: Install required software
+  apt:
+    pkg:
+    - docker-ce 
+    - docker-ce-cli 
+    - containerd.io 
+    - docker-compose-plugin
+    - docker-compose
+    update_cache: yes
+    state: latest
+
+- name: Add the user vagrant to group docker
+  ansible.builtin.user:
+    name: vagrant
+    groups: docker
+    append: yes
+
+- name: Enable docker daemon
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: Synchronization
+  copy:
+    src: "./stack/"
+    dest: "/opt/stack/"
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
+- name: Pull all images in compose
+  command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml pull
+  when:  not inventory_hostname == "monitoring.netology.tech"
+
+- name: Up all services in compose
+  command: docker-compose -f /opt/stack/exporters/docker-compose.exporters.yaml up -d
+  when: not  inventory_hostname == "monitoring.netology.tech"
+
+
+
+
+#- name: Pull default Docker image
+#  docker_image:
+#    name: gitlab/gitlab-runner:latest
+#    source: pull
+
+#    # Creates container
+#  - name: Create default containers
+#    docker_container:
+#      name: "{{ default_container_name }}{{ item }}"
+#      image: "{{ default_container_image }}"
+#      command: "{{ default_container_command }}"
+#      state: present

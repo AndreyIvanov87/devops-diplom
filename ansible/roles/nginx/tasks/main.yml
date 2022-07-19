@@ -1,6 +1,11 @@
-- name: Set hostname
-  hostname:
-    name: "{{ inventory_hostname }}"
+#- name: Set hostname
+#  hostname:
+#    name: "{{ inventory_hostname }}"
+
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+
+
 - name: Install Nginx Web Server on Debian Family
   apt:
     name=nginx
@@ -19,6 +24,15 @@
   template:
     src=templates/nginx.conf
     dest=/etc/nginx/nginx.conf
+
+- name: copy .htpasswd
+  copy:
+    src: templates/.htpasswd
+    dest: /etc/nginx/.htpasswd
+    owner: root
+    group: root
+    mode: 0444
+
 
 
 - name: place vhost

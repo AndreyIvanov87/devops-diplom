@@ -23,6 +23,7 @@ resource "local_file" "inventory" {
     app.netology.tech ansible_host=${yandex_compute_instance.appvm.network_interface.0.ip_address}
     gitlab.netology.tech ansible_host=${yandex_compute_instance.gitlabvm.network_interface.0.ip_address}
     runner.netology.tech ansible_host=${yandex_compute_instance.runnervm.network_interface.0.ip_address}
+    monitoring.netology.tech ansible_host=${yandex_compute_instance.monitoringvm.network_interface.0.ip_address}
 
     [back:vars]
     ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ${yandex_compute_instance.gate.network_interface.0.nat_ip_address}"'
@@ -36,15 +37,9 @@ resource "local_file" "inventory" {
     yandex_compute_instance.dbvm,
     yandex_compute_instance.appvm,
     yandex_compute_instance.gitlabvm,
-    yandex_compute_instance.runnervm
+    yandex_compute_instance.runnervm,
+    yandex_compute_instance.monitoringvm
   ]
-
-################later
-#    [back]
-#    gitlab.netology.tech ansible_host=${yandex_compute_instance.gitlab.network_interface.0.ip_address}
-#    runner.netology.tech ansible_host=${yandex_compute_instance.runner.network_interface.0.ip_address}
-#    monitor.netology.tech ansible_host=${yandex_compute_instance.monitor.network_interface.0.ip_address}
-
 
 }
 

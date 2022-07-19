@@ -49,4 +49,11 @@ output "internal_ip_address_runnervm" {
 output "external_ip_address_runnervm" {
   value = yandex_compute_instance.runnervm.network_interface.0.nat_ip_address
 }
+output "internal_ip_address_monitorinvm" {
+  value = yandex_compute_instance.monitoringvm.network_interface.0.ip_address
+}
+
+output "external_ip_address_monitorinvm" {
+  value = yandex_compute_instance.monitoringvm.network_interface.0.nat_ip_address
+}
 

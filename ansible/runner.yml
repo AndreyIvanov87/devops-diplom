@@ -1,0 +1,52 @@
+---
+  - name: play start runner
+    hosts: runner.netology.tech
+    become: false
+    remote_user: vagrant
+    vars:
+      gitlab_token: "{{ lookup('file', '/tmp/token.txt') }}"
+      gitlab_url: "http://192.168.2.204"
+    tasks:
+          #Вот это рабочий вариант, ниже тест модуля ансибл
+      #- name: Pull images
+      #  command: docker pull gitlab/gitlab-runner:latest
+
+      - name: Pull  Docker image
+        become: true
+        docker_image:
+          name: gitlab/gitlab-runner:latest
+          source: pull
+
+      - name: print token for runner
+        debug:
+          msg: "{{ gitlab_token }}"
+
+      - name: Reset ssh connection to allow user changes to affect 'current login user'
+        ansible.builtin.meta: reset_connection
+          
+      - name: Create directory for docker volume
+        file: state=directory mode=0755 dest=/home/vagrant/gitlab-runner
+      - name: Check that the somefile.conf exists
+        stat:
+          path: /home/vagrant/gitlab-runner/config.toml
+        register: register_check
+
+      - name: register runner
+        ansible.builtin.raw: docker run --rm -it --net host --name gitlab-runner --privileged -v ~/gitlab-runner:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest register --non-interactive --executor "shell" --url "{{  gitlab_url  }}" --registration-token "{{  gitlab_token  }}" --run-untagged="true" --locked="false"
+        when: not register_check.stat.exists
+
+        #try to rewrite whith module docker_container
+      - name: start registered runner
+        ansible.builtin.raw: docker run --rm -it -d --net host --name gitlab-runner --privileged -v ~/gitlab-runner:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
+
+      - name: copy ssh key
+        copy:
+          src: /home/vagrant/.ssh/id_rsa
+          dest: /home/vagrant/.ssh/id_rsa
+          owner: vagrant
+          group: vagrant
+          mode: 0600
+
+
+
+

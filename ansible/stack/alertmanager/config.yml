@@ -1,0 +1,26 @@
+#route:
+#    receiver: 'slack'
+
+#receivers:
+#    - name: 'slack'
+#      slack_configs:
+#          - send_resolved: true
+#            text: "{{ .CommonAnnotations.description }}"
+#            username: 'Prometheus'
+#            channel: '#<channel-name>'
+#            api_url: 'https://hooks.slack.com/services/<webhook-id>'
+#
+
+global:
+    smtp_from: monitoring@netology.tech
+
+route:
+    receiver: send_email
+
+receivers:
+    - name: send_email
+      email_configs:
+      - to: root@db1.unix-server.su
+        smarthost: localhost:25
+        require_tls: false
+

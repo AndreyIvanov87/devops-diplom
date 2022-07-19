@@ -1,0 +1,24 @@
+---
+- name: install docker engine and docker-compose plugin at all hosts
+  hosts: all
+  become: true
+  remote_user: vagrant
+  roles:
+   - install-docker
+
+- name: start monitoring on special server
+  hosts: monitoring.netology.tech
+  become: true
+  remote_user: vagrant
+  roles:
+   - monitoring
+
+#- name: install app server with wordpress
+#  hosts: app.netology.tech
+#  gather_facts: yes
+#  become: true
+#  remote_user: vagrant
+#  roles:
+#    - server
+#    - wordpress
+

@@ -1,0 +1,81 @@
+---
+  - name: prepare gitlab
+    hosts: gitlab.netology.tech
+    become: true
+    gather_facts: no
+    remote_user: vagrant
+    tasks:
+    - name: check root password for gitlab
+      ansible.builtin.raw: "cat  /etc/gitlab/initial_root_password| grep 'Password:' | awk '{print $2}'|tr -d '\r\n'"
+      register: gitlab_password
+    - name: print password
+      debug:
+        msg: "{{  gitlab_password['stdout']  }}"
+  
+    - name: find runner registration token
+      ansible.builtin.command: gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"
+      register: gitlab_token
+    - name: print token for runner
+      debug:
+        msg: "{{ gitlab_token['stdout'] }}"
+    - name: save token to tmp file
+      local_action: copy content={{ gitlab_token.stdout }} dest=/tmp/token.txt
+
+
+
+
+  - name: setup runner
+    hosts: runner.netology.tech
+    become: true
+    remote_user: vagrant
+    tasks:
+      - name: Update apt cache
+        apt: update_cache=yes cache_valid_time=3600
+
+      - name: Install required software
+        apt: 
+          pkg:
+          - curl
+          - git
+          - ca-certificates 
+          - curl
+          - gnupg
+          - lsb-release
+
+      - name: Create directory for gpg-keys
+        file: state=directory mode=0755 dest=/etc/apt/keyrings
+
+      - name: Add Docker’s official GPG key
+        raw:  "curl -o /tmp/key https://download.docker.com/linux/ubuntu/gpg ; gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes /tmp/key ; rm /tmp/key" 
+   
+      - name: Add line to repos file
+        ansible.builtin.lineinfile:
+          path: /etc/apt/sources.list
+          line: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu focal stable"
+          create: yes
+
+      - name: Update apt cache
+        apt: update_cache=yes
+
+      - name: Install required software
+        apt:
+          pkg:
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-compose-plugin
+
+      - name: Add the user vagrant to group docker
+        ansible.builtin.user:
+          name: vagrant
+          groups: docker
+          append: yes
+
+      - name: Enable docker daemon
+        systemd:
+          name: docker
+          state: started
+          enabled: yes
+       
+          
+          #gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"

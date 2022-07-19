@@ -21,7 +21,7 @@ resource "yandex_compute_instance" "gate" {
   boot_disk {
     initialize_params {
       image_id = "fd84mnpg35f7s7b0f5lg"
-      #size = 10
+      size = 10
     }
   }
 
@@ -152,4 +152,33 @@ resource "yandex_compute_instance" "runnervm" {
 }
 
 
+resource "yandex_compute_instance" "monitoringvm" {
+  platform_id = "standard-v1"
+  name                      = "monitoring"
+  #zone                      = "ru-central1-a"
+  #hostname                  = "node01.netology.cloud"
+  allow_stopping_for_update = true
+
+  resources {
+    cores  = 4
+    memory = 4
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id    = "${var.ubuntu}"
+      size        = "50"
+    }
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.private-subnet.id
+    ip_address = "192.168.2.206"
+  }
+
+  metadata = {
+    user-data = "${file("./user-meta.txt")}"
+  }
+
+}
 
