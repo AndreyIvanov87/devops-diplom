@@ -15,6 +15,21 @@ resource "yandex_vpc_subnet" "private-subnet" {
 
 }
 
+resource "yandex_vpc_subnet" "private-subnet-b" {
+  name = "private-subnet-name-b"
+  zone           = "ru-central1-b"
+  network_id     = "${yandex_vpc_network.dipnet.id}"
+  v4_cidr_blocks = ["192.168.3.0/24"]
+  route_table_id = "${yandex_vpc_route_table.nat.id}"
+  depends_on = [
+    yandex_vpc_route_table.nat,
+    yandex_vpc_network.dipnet
+  ]
+
+}
+
+
+
 resource "yandex_vpc_route_table" "nat" {
   network_id = "${yandex_vpc_network.dipnet.id}"
 

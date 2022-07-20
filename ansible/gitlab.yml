@@ -11,6 +11,9 @@
     - name: print password
       debug:
         msg: "{{  gitlab_password['stdout']  }}"
+
+    - name: save password to tmp file
+      local_action: copy content={{ gitlab_password.stdout }} dest=/tmp/password.txt
   
     - name: find runner registration token
       ansible.builtin.command: gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"
@@ -21,6 +24,7 @@
     - name: save token to tmp file
       local_action: copy content={{ gitlab_token.stdout }} dest=/tmp/token.txt
 
+
     - name: add iptables rule for node_exporter
       ansible.builtin.iptables:
         chain: INPUT
@@ -28,4 +32,22 @@
         destination_port: 19100
         jump: ACCEPT
       
+    - name: copy ssh key
+      copy:
+        src: /home/vagrant/.ssh/id_rsa
+        dest: /home/vagrant/.ssh/id_rsa
+        owner: vagrant
+        group: vagrant
+        mode: 0600
+
+    - name: print instructions for initialisation repository
+      debug:
+              msg: cd ~ && gunzip -d /tmp/wordpress.tar.gz && tar -xf /tmp/wordpress.tar && cp /tmp/wp-config.php ./wordpress && cd wordpress && git init && git add * && git commit -m 'initial' && git branch -M main  && git -c http.sslVerify=false push https://root:"{{  gitlab_password.stdout  }}"@gitlab.netology.tech/root/wordpress main && cat /home/vagrant/diplom/devops-diplom/ansible/stack/.gitlab-ci.yml
+
+
+
+#    - name: Install gitlab-cli
+#      apt:
+#        pkg:
+#        - gitlab-cli 
     

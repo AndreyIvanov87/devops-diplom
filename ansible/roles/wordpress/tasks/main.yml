@@ -5,6 +5,13 @@
     dest=/tmp/wordpress.tar.gz
     validate_certs=no
 
+- name: copy current archive for gitlab
+  ansible.builtin.fetch:
+    src: /tmp/wordpress.tar.gz
+    dest: /tmp/
+    flat: yes
+    
+    
 - name: Extract WordPress  
   unarchive: 
     src=/tmp/wordpress.tar.gz 
@@ -27,6 +34,21 @@
   template:
     src=templates/wp-config.php
     dest=/var/www/wordpress/wp-config.php
+
+- name: Recursively change ownership of a wordpress directory
+  ansible.builtin.file:
+    path: /var/www/wordpress
+    state: directory
+    recurse: yes
+    owner: vagrant
+    group: vagrant
+
+
+- name: copy current wp-config for gitlab
+  ansible.builtin.fetch:
+    src: /var/www/wordpress/wp-config.php
+    dest: /tmp/
+    flat: yes
 
 
 

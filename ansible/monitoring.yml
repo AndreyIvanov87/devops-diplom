@@ -13,12 +13,4 @@
   roles:
    - monitoring
 
-#- name: install app server with wordpress
-#  hosts: app.netology.tech
-#  gather_facts: yes
-#  become: true
-#  remote_user: vagrant
-#  roles:
-#    - server
-#    - wordpress
 

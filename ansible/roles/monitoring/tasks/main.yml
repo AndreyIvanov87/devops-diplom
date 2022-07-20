@@ -14,14 +14,14 @@
 - name: Up all services in compose
   command: docker-compose -f /opt/stack/docker-compose.yaml up -d
 
-- name: install test soft
-  apt:
-    pkg:
-    - bridge-utils
-      #- bind-utils
-    - iptables
-    - net-tools
-    - tcpdump
-    - rsync
-    - telnet
-    - openssh-server
+#- name: install test soft
+#  apt:
+#    pkg:
+     #- bridge-utils
+     #- bind-utils
+     #- iptables
+     #- net-tools
+     #- tcpdump
+     #- rsync
+     #- telnet
+     #- openssh-server

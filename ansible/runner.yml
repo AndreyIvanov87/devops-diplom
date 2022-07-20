@@ -6,6 +6,7 @@
     vars:
       gitlab_token: "{{ lookup('file', '/tmp/token.txt') }}"
       gitlab_url: "http://192.168.2.204"
+      gitlab_password: "{{ lookup('file','/tmp/password.txt') }}"
     tasks:
           #Вот это рабочий вариант, ниже тест модуля ансибл
       #- name: Pull images
@@ -40,13 +41,28 @@
         ansible.builtin.raw: docker run --rm -it -d --net host --name gitlab-runner --privileged -v ~/gitlab-runner:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
 
       - name: copy ssh key
+        become: true
         copy:
           src: /home/vagrant/.ssh/id_rsa
-          dest: /home/vagrant/.ssh/id_rsa
-          owner: vagrant
-          group: vagrant
+          dest: /home/vagrant/gitlab-runner/id_rsa
+          owner: 999
+          group: 999
           mode: 0600
 
+      - name: copy script for rsync in runner-container
+        become: true
+        copy:
+          src: ./stack/rsync.sh
+          dest: /home/vagrant/gitlab-runner/rsync.sh
+          owner: 999
+          group: 999
+          mode: 0755
 
+      - name: install rsync in runner container
+        ansible.builtin.raw: docker exec -d  gitlab-runner '/etc/gitlab-runner/rsync.sh'
+
+      - name: print instructions for initialisation repository
+        debug:
+                msg: cd ~ && gunzip -d /tmp/wordpress.tar.gz && tar -xf /tmp/wordpress.tar && cp /tmp/wp-config.php ./wordpress && cd wordpress && git init && git add * && git commit -m 'initial' && git branch -M main  && git -c http.sslVerify=false push https://root:{{  gitlab_password  }}@gitlab.netology.tech/root/wordpress main && cat /home/vagrant/diplom/devops-diplom/ansible/stack/.gitlab-ci.yml
 
 
