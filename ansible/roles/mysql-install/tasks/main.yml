@@ -1,4 +1,4 @@
-- name: prepare python Debian Family
+- name: install python 
   ansible.builtin.apt:
     name: python3
     state: present
@@ -7,18 +7,17 @@
     ansible_os_family == "Debian"
 
 
-- name: Install mysql Server on Debian Family
+- name: Install mysql Server 
   apt:
     pkg:
     - mysql-server-8.0
     - mysql-client-8.0
-      #- python3
     - python3-pymysql
 
   when:
     ansible_os_family == "Debian"
 
-- name: place mysqld config
+- name: place mysqld config from template
   template:
     src=templates/mysqld.cnf
     dest=/etc/mysql/mysql.conf.d/mysqld.cnf
@@ -31,7 +30,7 @@
   when:   inventory_hostname   ==   mysql_slave
 
 
-- name: Check that the somefile.conf exists
+- name: Check that the file as flag exists
   stat:
     path: /home/vagrant/mysqld.cnf
   register: stat_kostyl
@@ -178,7 +177,5 @@
   #login_host: hostvars["{{ mysql_master }}"]['ansible_default_ipv4']['address']
   #CHANGE MASTER TO MASTER_HOST='192.168.2.201',MASTER_LOG_FILE='mysql-bin.000006',MASTER_LOG_POS=157, MASTER_USER='root', MASTER_PASSWORD='test-password';
 
-  # for test 
-  # login_host:  hostvars."{{ mysql_master }}".ansible_default_ipv4.address
 
 

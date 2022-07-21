@@ -1,17 +1,11 @@
-#- name: Set hostname
-#  hostname:
-#    name: "{{ inventory_hostname }}"
-
 - name: Update apt cache
   apt: update_cache=yes cache_valid_time=3600
 
 
-- name: Install Nginx Web Server on Debian Family
+- name: Install Nginx 
   apt:
     name=nginx
     state=latest
-  when:
-    ansible_os_family == "Debian"
   notify:
     - nginx systemd
 
@@ -20,12 +14,12 @@
     name=certbot
     state=latest
 
-- name: Replace nginx.conf
+- name: Replace original nginx.conf with temtlate
   template:
     src=templates/nginx.conf
     dest=/etc/nginx/nginx.conf
 
-- name: copy .htpasswd
+- name: copy .htpasswd for protected monitoring services
   copy:
     src: templates/.htpasswd
     dest: /etc/nginx/.htpasswd
@@ -35,9 +29,8 @@
 
 
 
-- name: place vhost
+- name: create vhost files from template
   template:
-    #src=templates/www.netology.tech.conf
     src=templates/template.conf
     dest=/etc/nginx/sites-enabled/{{ item.fqdn }}.conf
   with_items: "{{ sites }}"
@@ -49,7 +42,7 @@
     state: absent
 
 
-- name: Check that the somefile.conf exists
+- name: Check that the ssl-sertificate exists
   stat:
     path: /etc/letsencrypt/live/www.netology.tech/fullchain.pem
   register: stat_result
@@ -62,11 +55,11 @@
   when: not stat_result.stat.exists
   
 
-- name: Create certificates, if not exist
-  command: "certbot --test-cert --no-eff-email --standalone certonly -m ivanov@unix-server.su --agree-tos -d www.netology.tech,alertmanager.netology.tech,grafana.netology.tech,gitlab.netology.tech,prometheus.netology.tech,app.netology.tech"
+- name: Create certificates, if not exist. use --test-cert for test
+  command: "certbot  --no-eff-email --standalone certonly -m ivanov@unix-server.su --agree-tos -d www.netology.tech,alertmanager.netology.tech,grafana.netology.tech,gitlab.netology.tech,prometheus.netology.tech,app.netology.tech"
   when: not stat_result.stat.exists
 
-- name: copy ssh key
+- name: copy ssh key for jump host
   copy:
     src: /home/vagrant/.ssh/id_rsa
     dest: /home/vagrant/.ssh/id_rsa

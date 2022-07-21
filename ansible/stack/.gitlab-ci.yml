@@ -1,20 +1,5 @@
 stages:          # List of stages for jobs, and their order of execution
-#  - test
   - deploy
-#test-job:   # This job runs in the test stage.
-#  only:
-#    - tags 
-#  stage: test    # It only starts when the job in the build stage completes successfully.
-#  script:
-#   - git clone https://root:password@192.168.2.204/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}.git
-#   - git config user.name "devops"
-#   - git config user.email "devops@netology.tech"
-#   - cd ${CI_PROJECT_NAME}
-#   - echo 'test' >> test1.txt
-#   - git add test1.txt
-#   - git commit -m "yay! new files!"
-#   - git push https://root:password@192.168.2.204/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}.git main
-
 
 deploy-job:      # This job runs in the deploy stage.
   only:

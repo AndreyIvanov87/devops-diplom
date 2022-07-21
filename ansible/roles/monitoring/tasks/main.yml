@@ -1,12 +1,13 @@
 ---
-- name: Synchronization
-  copy:
-    src: "./stack/"
-    dest: "/opt/stack/"
-    owner: root
-    group: root
-    mode: 0644
-  become: true
+#it was in install-docker role for all hosts, skipping
+#- name: Synchronization
+#  copy:
+#    src: "./stack/"
+#    dest: "/opt/stack/"
+#    owner: root
+#    group: root
+#    mode: 0644
+#  become: true
 
 - name: Pull all images in compose
   command: docker-compose -f /opt/stack/docker-compose.yaml pull
@@ -14,14 +15,3 @@
 - name: Up all services in compose
   command: docker-compose -f /opt/stack/docker-compose.yaml up -d
 
-#- name: install test soft
-#  apt:
-#    pkg:
-     #- bridge-utils
-     #- bind-utils
-     #- iptables
-     #- net-tools
-     #- tcpdump
-     #- rsync
-     #- telnet
-     #- openssh-server

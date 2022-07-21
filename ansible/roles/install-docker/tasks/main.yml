@@ -2,11 +2,8 @@
 - name: Install aptitude using apt
   apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-#- name: Install required system packages
-#  apt: name={{ item }} state=latest update_cache=yes
-#  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
 
-- name: Install required system packages
+- name: Install software for monitoring etc
   apt: 
     pkg:
     - apt-transport-https
@@ -34,10 +31,7 @@
     repo: deb https://download.docker.com/linux/ubuntu bionic stable
     state: present
 
-#- name: Update apt and install docker-ce
-#  apt: update_cache=yes name=docker-ce state=latest
-
-- name: Install required software
+- name: Install docker
   apt:
     pkg:
     - docker-ce 
@@ -82,17 +76,3 @@
   when: not  inventory_hostname == "monitoring.netology.tech"
 
 
-
-
-#- name: Pull default Docker image
-#  docker_image:
-#    name: gitlab/gitlab-runner:latest
-#    source: pull
-
-#    # Creates container
-#  - name: Create default containers
-#    docker_container:
-#      name: "{{ default_container_name }}{{ item }}"
-#      image: "{{ default_container_image }}"
-#      command: "{{ default_container_command }}"
-#      state: present

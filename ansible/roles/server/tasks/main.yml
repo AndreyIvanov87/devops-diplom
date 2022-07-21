@@ -2,7 +2,7 @@
 - name: Update apt cache
   apt: update_cache=yes cache_valid_time=3600
 
-- name: Install required software
+- name: Install software for LAMP
   apt: 
     pkg:
     - apache2
@@ -10,11 +10,9 @@
     - php7.4-mysql
     - php7.4
     - libapache2-mod-php7.4
-      #- php7.4-mcrypt
     - python3-mysqldb
     - php7.4-gd 
     - php-ssh2
-      #- libssh2-php
     - php7.4-curl
     - php7.4-xml
     - php7.4-mbstring

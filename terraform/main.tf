@@ -62,7 +62,6 @@ resource "yandex_compute_instance" "dbvm" {
 }
 
   metadata = {
-    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
     user-data = "${file("./user-meta.txt")}"
   }
 }
@@ -72,8 +71,8 @@ resource "yandex_compute_instance" "appvm" {
 #  hostname    = "app.netology.tech"
   name        = "app"
   resources {
-    cores  = 2
-    memory = 2
+    cores  = 4
+    memory = 4
     core_fraction = 20
   }
 
@@ -96,7 +95,7 @@ resource "yandex_compute_instance" "appvm" {
 
 resource "yandex_compute_instance" "gitlabvm" {
   platform_id = "standard-v1"
-#  hostname    = "app.netology.tech"
+#  hostname    = "gitlab.netology.tech"
   name        = "gitlab"
   resources {
     cores  = 4
@@ -117,7 +116,6 @@ resource "yandex_compute_instance" "gitlabvm" {
 }
 
   metadata = {
-    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
     user-data = "${file("./user-meta.txt")}"
   }
 }
@@ -146,7 +144,6 @@ resource "yandex_compute_instance" "runnervm" {
 }
 
   metadata = {
-    #ssh-keys  = "vagrant:${file("~/.ssh/id_rsa.pub")}"
     user-data = "${file("./user-meta.txt")}"
   }
 }
@@ -156,7 +153,7 @@ resource "yandex_compute_instance" "monitoringvm" {
   platform_id = "standard-v1"
   name                      = "monitoring"
   #zone                      = "ru-central1-a"
-  #hostname                  = "node01.netology.cloud"
+  #hostname                  = "monitoring.netology.tech"
   allow_stopping_for_update = true
 
   resources {

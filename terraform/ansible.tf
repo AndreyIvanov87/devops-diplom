@@ -1,3 +1,4 @@
+# После генерации inventory запуск плейбука, который ждет пока все поднимется и задает имена хостов
 resource "null_resource" "connect" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/connect.yml"
@@ -8,6 +9,7 @@ resource "null_resource" "connect" {
   ]
 }
 
+# запуск плейбука для настройки шлюза с nat && proxy и сервера с wordpress
 resource "null_resource" "gate-setup" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/site.yml"
@@ -18,7 +20,7 @@ resource "null_resource" "gate-setup" {
   ]
 }
 
-
+# настройка баз данных
 resource "null_resource" "mysql-setup" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/mysql.yml"
@@ -28,7 +30,7 @@ resource "null_resource" "mysql-setup" {
     null_resource.gate-setup
   ]
 }
-
+# установка инстанса гитлаба 
 resource "null_resource" "gitlab-setup" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/gitlab.yml"
@@ -39,6 +41,7 @@ resource "null_resource" "gitlab-setup" {
   ]
 }
 
+# подключение мониторнига
 resource "null_resource" "monitoring-setup" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/monitoring.yml"
@@ -51,7 +54,7 @@ resource "null_resource" "monitoring-setup" {
     null_resource.gitlab-setup
   ]
 }
-
+# настройка гитлаб раннера и вывод инструкций по созданию репозитория.
 resource "null_resource" "gitlab-runner" {
   provisioner "local-exec" {
     command = "ANSIBLE_FORCE_COLOR=1 ansible-playbook -i ../ansible/inventory ../ansible/runner.yml"

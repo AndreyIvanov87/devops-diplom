@@ -10,7 +10,7 @@
         tags: 
           - wait
 
-  - name: Print os facts
+  - name: Chech connection
     hosts: all
     gather_facts: yes
     #become: true
@@ -18,7 +18,7 @@
       - name: Print OS
         debug:
           msg: "{{ ansible_distribution }}"
-      - name: Set hostname
+      - name: Set hostnames
         become: true
         hostname:
           name: "{{ inventory_hostname }}"

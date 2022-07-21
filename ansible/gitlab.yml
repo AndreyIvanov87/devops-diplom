@@ -46,8 +46,3 @@
 
 
 
-#    - name: Install gitlab-cli
-#      apt:
-#        pkg:
-#        - gitlab-cli 
-    

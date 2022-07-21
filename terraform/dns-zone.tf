@@ -1,10 +1,5 @@
 resource "yandex_dns_zone" "netology" {
   name        = "netology-zone-name"
-  #description = "Test public zone"
-
-  #labels = {
-  #  label1 = "test-public"
-  #}
 
   zone    = "gate.netology.tech."
   public  = true

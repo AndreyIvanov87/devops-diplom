@@ -17,7 +17,7 @@
     src=/tmp/wordpress.tar.gz 
     dest=/var/www/ 
     copy=no
-- name: update ports.conf for apache
+- name: update default ports.conf for apache to listen ipv4
   template:
     src=templates/ports.conf
     dest=/etc/apache2/ports.conf
@@ -30,7 +30,7 @@
   notify:
     - restart apache
 
-- name: place wp config file
+- name: place wp config file from template
   template:
     src=templates/wp-config.php
     dest=/var/www/wordpress/wp-config.php
@@ -51,7 +51,7 @@
     flat: yes
 
 
-
+#example of edition default wp-config, not used.
 #- name: Copy sample config file
 #  command: mv /var/www/wordpress/wp-config-sample.php /var/www/wordpress/wp-config.php creates=/var/www/wordpress/wp-config.php
 
